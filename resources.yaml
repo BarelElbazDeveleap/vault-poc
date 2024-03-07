@@ -1,0 +1,61 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: vault-auth-sa
+  namespace: default
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: vault-auth-secret
+  annotations:
+    kubernetes.io/service-account.name: vault-auth-sa
+type: kubernetes.io/service-account-token
+# ---
+# apiVersion: rbac.authorization.k8s.io/v1
+# kind: ClusterRole
+# metadata:
+#   name: secret-reader
+# rules:
+# - apiGroups: [""]
+#   resources: ["secrets"]
+#   verbs: ["get", "watch", "list"]
+# ---
+# apiVersion: rbac.authorization.k8s.io/v1
+# kind: ClusterRoleBinding
+# metadata:
+#   name: secret-reader-binding
+#   namespace: default
+# roleRef:
+#   apiGroup: rbac.authorization.k8s.io
+#   kind: ClusterRole
+#   name: system:auth-delegator
+# subjects:
+# - kind: ServiceAccount
+#   name: vault-auth-sa
+#   namespace: default
+---
+# Role for namespace-specific access
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: vault-auth-role
+  namespace: default
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "watch", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: vault-auth-role-binding
+  namespace: default
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: vault-auth-role
+subjects:
+- kind: ServiceAccount
+  name: vault-auth-sa
+  namespace: default

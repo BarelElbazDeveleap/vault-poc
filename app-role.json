@@ -1,0 +1,6 @@
+{
+    "bound_service_account_names": ["vault-auth-sa"],
+    "bound_service_account_namespaces": ["default"],
+    "policies": ["app-policy"],
+    "token_ttl": "3600"
+}
